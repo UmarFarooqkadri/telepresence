@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: terraform            # Update value for appropriate user name
+  namespace: default   # Update value for appropriate namespace
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name:  telepresence-role
+  namespace: default    # Should be the same as metadata.namespace of above  ServiceAccount
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: telepresence-role-binding
+  namespace: default   # Should be the same as metadata.namespace of above  ServiceAccount
+subjects:
+- kind: ServiceAccount
+  name: terraform            # Should be the same as metadata.name of above ServiceAccount
+roleRef:
+  kind: Role
+  name: telepresence-role
+  apiGroup: rbac.authorization.k8s.io
